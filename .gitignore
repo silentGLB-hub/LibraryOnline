@@ -1,0 +1,10 @@
+.vs/
+packages/
+**/bin/
+**/obj/
+*.user
+*.suo
+*.log
+TestResults/
+Web.Local.config
+work/

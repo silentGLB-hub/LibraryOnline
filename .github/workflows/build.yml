@@ -1,0 +1,15 @@
+name: Build MVC 5
+on:
+  push:
+    branches: [main]
+  pull_request:
+jobs:
+  build:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: microsoft/setup-msbuild@v2
+      - name: Restore and build .NET Framework 4.8
+        run: msbuild LibraryOnline.sln /restore /p:Configuration=Release /verbosity:minimal
+      - name: Check JavaScript
+        run: node --check LibraryOnline/Scripts/app.js
