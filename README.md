@@ -33,6 +33,13 @@ Mật khẩu chung là mật khẩu bạn chọn bằng `scripts/Configure-Demo.
 - Xuất PDF lịch sử mượn hoặc tiền phạt: thành viên chỉ thấy dữ liệu của mình, thủ thư/quản trị thấy toàn thư viện.
 - Quản trị tài khoản, thể loại, chính sách; thủ thư quản lý trạng thái thành viên. Khóa thay cho xóa tài khoản để bảo toàn lịch sử.
 
+## Đọc sách trực tuyến
+
+- Chi tiết sách → **Xem trước nội dung**: đọc thử không cần đăng nhập.
+- **Sách đang mượn → Đọc sách**: đọc toàn bộ khi đã nhận sách, còn hạn mượn.
+- Có mục lục/chuyển chương, đổi cỡ chữ và nền sáng/giấy ngà/tối.
+- **Quản lý sách → Nội dung & giới thiệu**: sửa tiểu sử tác giả, giới thiệu tác phẩm/NXB, đoạn đọc thử và toàn văn; xuất bản hoặc chuyển về bản nháp.
+
 ## Dữ liệu demo
 
 Seed gồm **1 Administrator, 2 Librarian, 20 Member, 8 thể loại, 50 sách, 41 phiếu, 10 phiếu quá hạn có phạt, 5 thanh toán, 5 yêu cầu gia hạn**. Có 9 phiếu đang đặt và 2 phiếu hủy; các phiếu mượn/trả cũng bắt đầu từ yêu cầu đặt. Có thành viên nhiều phiếu và thành viên chưa có lịch sử; có sách hết bản và sách còn bản. Số liệu quá hạn/thông báo thay đổi theo thời gian thật.
@@ -73,7 +80,7 @@ docs/            # Requirements mapping, architecture, API, demo, tests
 - Sách có lịch sử được lưu trữ khi xóa; tài khoản được khóa. Những bản ghi chưa được tham chiếu có thể xóa thật.
 - Maintenance chạy mỗi phút khi IIS đang hoạt động và trước mỗi API request. Khi IIS ngủ/dừng, không có job nền chạy; dữ liệu sẽ được tính bù khi website nhận request tiếp theo. Triển khai cần nhắc đúng thời điểm khi website ngủ thì cấu hình IIS Always Running hoặc gọi endpoint đọc định kỳ bằng scheduler.
 - Thông báo là **in-app**, không có tích hợp email/SMS; không có thanh toán trực tuyến. Ghi nhận thu tiền do thủ thư thực hiện sau khi nhận tiền tại quầy.
-- Không chứa file sách số có bản quyền. Tài nguyên số là phần mở rộng đề xuất, không thuộc bộ tính năng chấm điểm đã liệt kê.
+- Có trang đọc theo chương, đoạn xem trước công khai và thông tin tác giả/tác phẩm/NXB. Thủ thư nhập văn bản được phép phân phối tại **Quản lý sách → Nội dung & giới thiệu**. Nội dung có sẵn là văn bản minh họa tự viết, không phải nguyên tác của các tựa sách demo. Xem `docs/READING.md`.
 - Seed dùng `CreateDatabaseIfNotExists`, không tự xóa/tái tạo schema. Khi sửa model sau này cần migration có kiểm soát. Muốn demo lại từ đầu, đổi sang tên database demo mới và chạy lại (không tự động xóa database hiện tại).
 
 ## Bảo mật và triển khai

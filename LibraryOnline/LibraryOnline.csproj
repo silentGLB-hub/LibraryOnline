@@ -48,7 +48,7 @@
   <ItemGroup>
     <Compile Include="**\*.cs" Exclude="obj\**;bin\**;Web.Local.config" />
     <Content
-      Include="**\*.cshtml;**\*.config;**\*.css;**\*.js;**\*.svg;Global.asax"
+      Include="**\*.cshtml;**\*.config;**\*.css;**\*.js;**\*.svg;App_Data\*.sql;Global.asax"
       Exclude="obj\**;bin\**;Web.Local.config"
     />
   </ItemGroup>

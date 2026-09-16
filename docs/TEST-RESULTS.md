@@ -89,3 +89,12 @@ npx --yes --package=newman newman run postman/LibraryOnline.postman_collection.j
 Integration tạo tài khoản/sách QA riêng, thay ngày đến hạn của phiếu QA để kiểm thử quá hạn, rồi khóa tài khoản/lưu trữ sách QA khi hoàn tất. Không sửa phiếu demo có sẵn. Nếu bài test thất bại giữa chừng, dữ liệu QA có thể còn hoạt động. Chỉ chạy trên database demo cục bộ. Tệp TestResults chứa cookie/session kiểm thử nên bị loại khỏi Git.
 
 Các kiểm tra này không thay thế kiểm thử tải, penetration test hoặc kiểm thử triển khai production.
+
+## Bổ sung chức năng đọc sách (16/09/2026)
+
+- Build Debug: thành công.
+- Kiểm thử API đọc sách: **21/21 đạt**, bao gồm quyền đọc sau khi nhận sách, chặn đặt chỗ/chưa đăng nhập/quá hạn/đã trả, thu hồi khi ngừng xuất bản, kiểm tra phiên bản khi sửa và giới hạn dữ liệu.
+- Postman Reader chạy bằng Newman: **12 request, 17 assertions, 0 lỗi**.
+- Trình duyệt: xem trước không đăng nhập, đăng nhập quay về sách đã chọn, mục lục và chuyển chương hoạt động.
+- SQL bổ sung bảng nội dung cho 50 sách, giữ nguyên dữ liệu nghiệp vụ hiện có. Nội dung đọc là văn bản minh họa; không phải toàn văn các tác phẩm trong danh mục.
+- Hướng dẫn sử dụng và API: [READING.md](READING.md).

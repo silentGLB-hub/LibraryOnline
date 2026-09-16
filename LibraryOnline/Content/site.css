@@ -1,4 +1,4 @@
-@import url("/Content/typography.css");
+﻿@import url("/Content/typography.css");
 :root {
   --bg: #f6f5f0;
   --paper: #fffefa;
@@ -957,5 +957,114 @@ dialog::backdrop {
   }
   dialog {
     padding: 28px 20px;
+  }
+}
+
+.book-information {
+  border-top: 1px solid var(--line);
+  margin-top: 25px;
+  padding-top: 10px;
+}
+.book-information details {
+  border-bottom: 1px solid var(--line);
+  padding: 14px 0;
+}
+.book-information summary {
+  cursor: pointer;
+  font-weight: 600;
+}
+.information-prose p {
+  color: var(--ink);
+  line-height: 1.8;
+  white-space: normal;
+  overflow-wrap: anywhere;
+}
+.demo-notice {
+  padding: 13px 17px;
+  border-left: 3px solid #b4944b;
+  background: #f5efda;
+  color: #75613a;
+  font-size: 12px;
+}
+.reader-page {
+  max-width: 950px;
+  margin: auto;
+}
+.reader-page .page-title {
+  margin-top: 24px;
+}
+.reader-toolbar,
+.reader-pagination {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  flex-wrap: wrap;
+  margin: 20px 0;
+  font-size: 12px;
+}
+.reader-toolbar select,
+.reader-pagination select {
+  background: var(--paper);
+  color: var(--ink);
+  border: 1px solid var(--line);
+  border-radius: 4px;
+  padding: 8px;
+  max-width: 310px;
+}
+.reader-pagination {
+  background: transparent;
+  padding: 0;
+}
+.reader-paper {
+  background: #fffefa;
+  color: #2d3930;
+  padding: 45px 60px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  font:
+    21px/1.95 Cambria,
+    Georgia,
+    serif;
+  overflow-wrap: anywhere;
+  min-height: 380px;
+  box-shadow: 0 4px 18px #233c3405;
+}
+.reader-paper p {
+  color: inherit;
+  margin: 0 0 1.2em;
+}
+.reader-paper p:first-child {
+  font-size: 1.25em;
+  font-weight: 600;
+}
+.reader-paper.sepia {
+  background: #f2e6cb;
+  color: #4a3a28;
+}
+.reader-paper.night {
+  background: #202b27;
+  color: #e2e6dd;
+  border-color: #3a4940;
+}
+#material-form textarea {
+  min-height: 90px;
+  font-size: 13px;
+}
+#material-form textarea[name="FullText"] {
+  min-height: 280px;
+}
+@media (max-width: 600px) {
+  .reader-paper {
+    padding: 24px 20px;
+  }
+  .reader-pagination select {
+    max-width: 235px;
+  }
+  .reader-toolbar {
+    align-items: flex-start;
+  }
+  .reader-pagination {
+    justify-content: flex-start;
   }
 }

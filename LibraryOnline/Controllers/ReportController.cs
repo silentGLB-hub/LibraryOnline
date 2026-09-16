@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Data.Entity;
 using System.IO;
 using System.Linq;
@@ -19,6 +19,7 @@ namespace LibraryOnline.Controllers
             var known = new[]
             {
                 "Catalog",
+                "Reader",
                 "Account",
                 "Loans",
                 "Fines",
@@ -32,7 +33,12 @@ namespace LibraryOnline.Controllers
             };
             if (!known.Contains(page))
                 return HttpNotFound();
-            if (page != "Catalog" && page != "Account" && !User.Identity.IsAuthenticated)
+            if (
+                page != "Catalog"
+                && page != "Account"
+                && page != "Reader"
+                && !User.Identity.IsAuthenticated
+            )
                 return Redirect("/Account");
             if (
                 new[] { "Dashboard", "ManageBooks", "Users" }.Contains(page)

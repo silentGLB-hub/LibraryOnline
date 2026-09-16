@@ -130,7 +130,9 @@ function nav() {
     )
     .join("");
   const current = links.find((x) => x[0] === page);
-  $("#breadcrumb").textContent = "Thư viện / " + (current?.[2] || "Tài khoản");
+  $("#breadcrumb").textContent =
+    "Thư viện / " +
+    (current?.[2] || (page === "Reader" ? "Đọc sách" : "Tài khoản"));
   $("#login-link").hidden = !!session.user;
   $("#logout").hidden = !session.user;
   $("#profile-link").innerHTML = session.user
@@ -170,12 +172,13 @@ async function loadCatalog() {
     `<button class="secondary" data-action="prev" ${catalogPage === 1 ? "disabled" : ""}>← Trước</button><span>${catalogPage} / ${total}</span><button class="secondary" data-action="next" ${catalogPage >= total ? "disabled" : ""}>Tiếp →</button>`;
 }
 async function detail(id) {
+  const info = await api(`books/${id}/information`);
   const d = await api("books/" + id),
     b = d.book;
   let lists = [];
   if (member()) lists = await api("reading-lists");
   openModal(
-    `<div class="detail"><img src="${esc(b.CoverImage)}" alt="${esc(b.Title)}"><div><div class="eyebrow">${esc(b.Category.Name)}</div><h2>${esc(b.Title)}</h2><p>${esc(b.Author)}</p><dl><dt>Nhà xuất bản</dt><dd>${esc(b.Publisher)}</dd><dt>Năm xuất bản</dt><dd>${b.PublicationYear}</dd><dt>ISBN</dt><dd>${esc(b.ISBN)}</dd><dt>Số bản còn</dt><dd>${b.AvailableCopies} / ${b.TotalCopies}</dd></dl><p>${esc(b.Description)}</p><div class="actions">${member() ? `<button class="primary" data-action="reserve" data-id="${id}" ${!b.AvailableCopies ? "disabled" : ""}>Đặt sách để nhận →</button>` : !session.user ? '<a class="button" href="/Account">Đăng nhập để đặt sách</a>' : ""}</div>${member() ? `<form id="save-book-form">${select("Lưu vào danh sách đọc", "ListId", [{ value: "", label: "Chọn danh sách" }, ...lists.map((l) => ({ value: l.Id, label: l.Name }))])}<button type="submit" class="secondary">♡ Lưu sách</button><a class="pill-link" href="/Reading">Tạo danh sách</a></form>` : ""}</div></div><div class="section-head"><h3>Cùng thể loại</h3></div>${d.related.map((x) => `<button class="secondary" data-action="detail" data-id="${x.Id}">${esc(x.Title)}</button>`).join(" ")}`,
+    `<div class="detail"><img src="${esc(b.CoverImage)}" alt="${esc(b.Title)}"><div><div class="eyebrow">${esc(b.Category.Name)}</div><h2>${esc(b.Title)}</h2><p>${esc(b.Author)}</p><dl><dt>Nhà xuất bản</dt><dd>${esc(b.Publisher)}</dd><dt>Năm xuất bản</dt><dd>${b.PublicationYear}</dd><dt>ISBN</dt><dd>${esc(b.ISBN)}</dd><dt>Số bản còn</dt><dd>${b.AvailableCopies} / ${b.TotalCopies}</dd></dl><p>${esc(b.Description)}</p><div class="actions">${member() ? `<button class="primary" data-action="reserve" data-id="${id}" ${!b.AvailableCopies ? "disabled" : ""}>Đặt sách để nhận →</button>` : !session.user ? '<a class="button" href="/Account">Đăng nhập để đặt sách</a>' : ""}</div>${member() ? `<form id="save-book-form">${select("Lưu vào danh sách đọc", "ListId", [{ value: "", label: "Chọn danh sách" }, ...lists.map((l) => ({ value: l.Id, label: l.Name }))])}<button type="submit" class="secondary">♡ Lưu sách</button><a class="pill-link" href="/Reading">Tạo danh sách</a></form>` : ""}</div></div>${informationPanel(id, info)}<div class="section-head"><h3>Cùng thể loại</h3></div>${d.related.map((x) => `<button class="secondary" data-action="detail" data-id="${x.Id}">${esc(x.Title)}</button>`).join(" ")}`,
   );
   if (member())
     submitForm("save-book-form", async (f) => {
@@ -196,7 +199,11 @@ async function account(register = false) {
     if (register) {
       await account(false);
       toast("Tạo tài khoản thành công. Hãy đăng nhập.");
-    } else location.href = "/Catalog";
+    } else {
+      const back = new URLSearchParams(location.search).get("book");
+      location.href =
+        back && /^\d+$/.test(back) ? `/Reader?book=${back}` : "/Catalog";
+    }
   });
 }
 async function loans() {
@@ -229,7 +236,7 @@ async function loans() {
         .filter((l) => !status || l.Status === status)
         .map(
           (l) =>
-            `<tr><td>#${l.Id}<br><strong>${esc(l.title)}</strong></td><td>${staff() ? esc(l.member) : date(l.ReservedAt)}</td><td>${date(l.Status === "Reserved" ? l.PickupExpiresAt : l.DueAt)}<small>${l.Status === "Reserved" ? "Hạn nhận" : "Gia hạn " + l.RenewalCount + " lần"}</small></td><td>${badge(l.Status)}</td><td>${l.Status === "Reserved" ? `${staff() ? `<button class="secondary" data-action="checkout" data-id="${l.Id}">Giao sách</button>` : ""}<button class="danger" data-action="cancel" data-id="${l.Id}">Hủy đặt</button>` : ""}${["Borrowed", "Overdue"].includes(l.Status) && staff() ? `<button class="secondary" data-action="return" data-id="${l.Id}">Nhận trả</button>` : ""}${l.Status === "Borrowed" && member() ? `<button class="secondary" data-action="renew" data-id="${l.Id}">Xin gia hạn</button>` : ""}</td></tr>`,
+            `<tr><td>#${l.Id}<br><strong>${esc(l.title)}</strong></td><td>${staff() ? esc(l.member) : date(l.ReservedAt)}</td><td>${date(l.Status === "Reserved" ? l.PickupExpiresAt : l.DueAt)}<small>${l.Status === "Reserved" ? "Hạn nhận" : "Gia hạn " + l.RenewalCount + " lần"}</small></td><td>${badge(l.Status)}</td><td>${l.Status === "Reserved" ? `${staff() ? `<button class="secondary" data-action="checkout" data-id="${l.Id}">Giao sách</button>` : ""}<button class="danger" data-action="cancel" data-id="${l.Id}">Hủy đặt</button>` : ""}${["Borrowed", "Overdue"].includes(l.Status) && staff() ? `<button class="secondary" data-action="return" data-id="${l.Id}">Nhận trả</button>` : ""}${l.Status === "Borrowed" && member() ? `<a class="button secondary" href="/Reader?book=${l.BookId}">Đọc sách</a>` : ""}${l.Status === "Borrowed" && member() ? `<button class="secondary" data-action="renew" data-id="${l.Id}">Xin gia hạn</button>` : ""}</td></tr>`,
         ),
     );
   }
@@ -350,7 +357,7 @@ async function manageBooks() {
       ],
       d.items.map(
         (b) =>
-          `<tr><td><strong>${esc(b.Title)}</strong><small>${esc(b.ISBN)}</small></td><td>${esc(b.Author)}</td><td>${esc(b.Category.Name)}</td><td>${b.AvailableCopies}/${b.TotalCopies}</td><td>${b.IsActive ? "Đang lưu hành" : "Lưu trữ"}</td><td><button class="secondary" data-action="edit-book" data-id="${b.Id}">Sửa</button><button class="danger" data-action="delete-book" data-id="${b.Id}">Xóa / lưu trữ</button></td></tr>`,
+          `<tr><td><strong>${esc(b.Title)}</strong><small>${esc(b.ISBN)}</small></td><td>${esc(b.Author)}</td><td>${esc(b.Category.Name)}</td><td>${b.AvailableCopies}/${b.TotalCopies}</td><td>${b.IsActive ? "Đang lưu hành" : "Lưu trữ"}</td><td><button class="secondary" data-action="edit-book" data-id="${b.Id}">Sửa</button><button class="secondary" data-action="edit-material" data-id="${b.Id}">Nội dung & giới thiệu</button><button class="danger" data-action="delete-book" data-id="${b.Id}">Xóa / lưu trữ</button></td></tr>`,
       ),
     )}</div>`;
 }
@@ -512,7 +519,132 @@ function nameModal(heading, value, handler) {
     toast("Đã lưu.");
   });
 }
+
+function prose(text) {
+  return String(text || "")
+    .split(/\n\s*\n/)
+    .filter(Boolean)
+    .map((p) => `<p>${esc(p).replace(/\n/g, "<br>")}</p>`)
+    .join("");
+}
+function informationPanel(id, info) {
+  return `<section class="book-information"><div class="section-head"><h3>Đọc & khám phá tác phẩm</h3></div>
+  ${info.isDemo ? '<p class="demo-notice">Bản đọc minh họa, không phải nguyên văn tác phẩm.</p>' : ""}
+  <div class="actions">${info.hasPreview ? `<a class="button secondary" href="/Reader?book=${id}&preview=1">Xem trước nội dung</a>` : '<span class="hint">Chưa có đoạn đọc thử.</span>'}
+  ${info.canRead ? `<a class="button" href="/Reader?book=${id}">Đọc sách ngay →</a>` : info.hasDigitalContent ? `<span class="hint">Đọc toàn bộ sau khi nhận sách, trong thời hạn mượn.</span>` : '<span class="hint">Chưa có bản đọc điện tử.</span>'}</div>
+  <details open><summary>Về tác phẩm</summary><div class="information-prose">${prose(info.workIntroduction || "Chưa có giới thiệu tác phẩm.")}</div></details>
+  <details><summary>Tác giả · ${esc(info.author)}</summary><div class="information-prose">${prose(info.authorBiography || "Chưa có tiểu sử tác giả.")}</div></details>
+  <details><summary>Nhà xuất bản · ${esc(info.publisher)}</summary><div class="information-prose">${prose(info.publisherInformation || "Chưa có thông tin giới thiệu nhà xuất bản.")}</div></details></section>`;
+}
+async function editMaterial(id) {
+  const [m, d] = await Promise.all([
+    api(`books/${id}/material`),
+    api(`books/${id}`),
+  ]);
+  const area = (label, name, value, max, rows = 4) =>
+    `<label class="field wide">${label}<textarea name="${name}" maxlength="${max}" rows="${rows}">${esc(value)}</textarea></label>`;
+  openModal(`<h2>Nội dung & giới thiệu</h2><p>${esc(d.book.Title)}</p><form id="material-form">
+    ${area("Thông tin tác giả / tiểu sử / nguồn tham khảo", "AuthorBiography", m.AuthorBiography, 6000)}
+    ${area("Giới thiệu tác phẩm", "WorkIntroduction", m.WorkIntroduction, 6000)}
+    ${area("Nhà xuất bản / giới thiệu / liên hệ", "PublisherInformation", m.PublisherInformation, 6000)}
+    ${area("Đoạn xem trước công khai (tối đa 6.000 ký tự)", "PreviewText", m.PreviewText, 6000, 6)}
+    ${area("Nội dung đọc (văn bản thuần, tối đa 500.000 ký tự)", "FullText", m.FullText, 500000, 14)}
+    <p class="hint">Mỗi chương bắt đầu bằng một dòng tiêu đề. Ngăn cách các chương bằng một dòng chỉ chứa <strong>---</strong>. Chỉ nhập nội dung bạn được phép phân phối. Đoạn xem trước được xuất bản công khai, độc lập với toàn văn.</p>
+    ${select(
+      "Xuất bản bản đọc & đoạn xem trước",
+      "IsPublished",
+      [
+        { value: "false", label: "Bản nháp / tắt đọc" },
+        { value: "true", label: "Xuất bản" },
+      ],
+      String(m.IsPublished),
+    )}
+    ${select(
+      "Loại nội dung",
+      "IsDemo",
+      [
+        { value: "true", label: "Văn bản minh họa, không phải nguyên tác" },
+        { value: "false", label: "Nội dung tác phẩm được phép phân phối" },
+      ],
+      String(m.IsDemo),
+    )}
+    <button type="submit" class="primary">Lưu nội dung</button></form>`);
+  submitForm("material-form", async (f) => {
+    f.IsPublished = f.IsPublished === "true";
+    f.IsDemo = f.IsDemo === "true";
+    f.Version = m.Version;
+    await api(`books/${id}/material`, "PUT", f);
+    modal.close();
+    toast("Đã lưu nội dung và thông tin sách.");
+  });
+}
+let readerCheckTimer;
+async function reader() {
+  clearInterval(readerCheckTimer);
+  const params = new URLSearchParams(location.search),
+    id = Number(params.get("book")),
+    preview = params.get("preview") === "1";
+  if (!Number.isInteger(id) || id < 1) {
+    main.innerHTML =
+      '<div class="empty">Hãy chọn một sách từ kho sách hoặc phiếu mượn.</div>';
+    return;
+  }
+  main.innerHTML = '<div class="loading">Đang mở trang sách…</div>';
+  let data,
+    chapter = 1;
+  try {
+    data = await api(`books/${id}/${preview ? "preview" : "reader?chapter=1"}`);
+  } catch (e) {
+    readerError(e.message, id);
+    return;
+  }
+  const render = () => {
+    main.innerHTML = `<section class="reader-page"><a class="pill-link" href="/Catalog">← Về kho sách</a>
+    ${title(preview ? "MỘT PHẦN NỘI DUNG" : "KHÔNG GIAN ĐỌC SÁCH", esc(data.title), esc(data.author))}
+    ${data.isDemo ? '<p class="demo-notice">Nội dung minh họa do hệ thống tạo, không phải nguyên văn tác phẩm. Thủ thư có thể thay bằng nội dung được phép phân phối.</p>' : ""}
+    <div class="reader-toolbar"><span>${preview ? "Bạn đang xem đoạn đọc thử." : data.staffAccess ? "Chế độ kiểm tra nội dung của thủ thư." : "Quyền đọc đến hết ngày " + date(data.dueAt) + " (UTC)."}</span>
+    <div class="actions"><label>Cỡ chữ <select id="reader-size"><option value="18">Vừa</option><option value="21" selected>Lớn</option><option value="24">Rất lớn</option></select></label><label>Nền <select id="reader-theme"><option value="paper">Sáng</option><option value="sepia">Giấy ngà</option><option value="night">Tối</option></select></label></div></div>
+    ${!preview ? `<nav class="reader-pagination" aria-label="Điều hướng chương"><button id="reader-prev" class="secondary" ${chapter === 1 ? "disabled" : ""}>← Chương trước</button><label>Chương <select id="reader-chapter">${data.chapters.map((c) => `<option value="${c.number}" ${chapter === c.number ? "selected" : ""}>${esc(c.title)}</option>`).join("")}</select></label><button id="reader-next" class="secondary" ${chapter === data.totalChapters ? "disabled" : ""}>Chương tiếp →</button></nav>` : ""}
+    <article id="reader-text" class="reader-paper" tabindex="0" aria-label="Nội dung sách">${prose(data.text)}</article>
+    ${preview ? `<div class="panel"><h3>Bạn vừa xem hết đoạn đọc thử</h3><p>Nhận sách tại thư viện để được đọc toàn bộ trong thời hạn mượn.</p><a class="button" href="${session.user ? "/Reader?book=" + id : "/Account?book=" + id}">${session.user ? "Mở bản đọc đầy đủ" : "Đăng nhập để đọc"}</a></div>` : `<p class="hint">Chương ${chapter} / ${data.totalChapters} · Quyền đọc được kiểm tra lại khi chuyển chương và định kỳ.</p>`}</section>`;
+    $("#reader-size").onchange = (e) =>
+      ($("#reader-text").style.fontSize = e.target.value + "px");
+    $("#reader-theme").onchange = (e) =>
+      ($("#reader-text").className = "reader-paper " + e.target.value);
+    if (!preview) {
+      $("#reader-prev").onclick = () => change(chapter - 1);
+      $("#reader-next").onclick = () => change(chapter + 1);
+      $("#reader-chapter").onchange = (e) => change(Number(e.target.value));
+    }
+  };
+  const change = async (n) => {
+    try {
+      data = await api(`books/${id}/reader?chapter=${n}`);
+      chapter = n;
+      render();
+      $("#reader-text").scrollIntoView({ behavior: "smooth", block: "start" });
+    } catch (e) {
+      clearInterval(readerCheckTimer);
+      readerError(e.message, id);
+    }
+  };
+  render();
+  if (!preview)
+    readerCheckTimer = setInterval(async () => {
+      try {
+        await api(`books/${id}/reader?chapter=${chapter}`);
+      } catch (e) {
+        clearInterval(readerCheckTimer);
+        readerError(e.message, id);
+      }
+    }, 60000);
+}
+function readerError(message, id) {
+  main.innerHTML = `<section class="panel"><h1>Chưa thể mở bản đọc</h1><p>${esc(message)}</p><div class="actions"><a class="button secondary" href="/Reader?book=${id}&preview=1">Xem trước nội dung</a>${!session.user ? `<a class="button" href="/Account?book=${id}">Đăng nhập</a>` : '<a class="button" href="/Loans">Kiểm tra phiếu mượn</a>'}<a class="pill-link" href="/Catalog">Về kho sách</a></div></section>`;
+}
+
 const pages = {
+  Reader: reader,
   Catalog: catalog,
   Account: account,
   Loans: loans,
@@ -534,6 +666,7 @@ document.addEventListener("click", async (e) => {
   b.disabled = true;
   try {
     if (a === "detail") await detail(id);
+    if (a === "edit-material") await editMaterial(id);
     if (a === "prev" || a === "next") {
       catalogPage += a === "prev" ? -1 : 1;
       await loadCatalog();
@@ -665,7 +798,7 @@ document.addEventListener(
     session = await api("session");
     categories = await api("categories");
     nav();
-    if (!session.user && !["Catalog", "Account"].includes(page)) {
+    if (!session.user && !["Catalog", "Account", "Reader"].includes(page)) {
       location.href = "/Account";
       return;
     }

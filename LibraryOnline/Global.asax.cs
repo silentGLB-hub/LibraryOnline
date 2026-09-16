@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Data.Entity;
 using System.Linq;
 using System.Security.Principal;
@@ -19,6 +19,7 @@ namespace LibraryOnline
             Database.SetInitializer(new DemoInitializer());
             using (var db = new LibraryDb())
                 db.Database.Initialize(false);
+            BookContentStore.Initialize();
             AreaRegistration.RegisterAllAreas();
             GlobalConfiguration.Configure(c =>
             {
