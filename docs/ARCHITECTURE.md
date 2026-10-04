@@ -6,7 +6,7 @@ MVC HomeController phục vụ các trang và chặn trang quản trị không �
 
 ## Mô hình dữ liệu
 
-- AspNetUsers ↔ AspNetRoles qua AspNetUserRoles (ASP.NET Identity).
+- Users: mỗi tài khoản có một Role, không cần bảng vai trò hay bảng nối.
 - Category 1–N Book. ISBN duy nhất; RowVersion hỗ trợ optimistic concurrency.
 - Member 1–N Loan; Book 1–N Loan. Reserved giữ một bản sách. Trả/hủy/hết hạn giải phóng đúng một bản.
 - Loan 1–0..1 Fine; Fine 1–N FinePayment. Fine.LoanId có unique index; số đã thu phải bằng tổng giao dịch thanh toán.

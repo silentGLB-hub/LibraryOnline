@@ -113,13 +113,7 @@ namespace LibraryOnline.Controllers
                 return s.Write(() =>
                 {
                     var m = Accounts.Manager(s.Db);
-                    var u = new AppUser
-                    {
-                        UserName = input.Email,
-                        Email = input.Email,
-                        FullName = input.FullName,
-                        LockoutEnabled = true,
-                    };
+                    var u = new AppUser { Email = input.Email, FullName = input.FullName };
                     var r = m.Create(u, input.Password);
                     if (!r.Succeeded)
                         throw new RuleException(string.Join(" ", r.Errors));

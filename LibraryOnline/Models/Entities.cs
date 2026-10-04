@@ -3,12 +3,26 @@ using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Data.Entity;
-using Microsoft.AspNet.Identity.EntityFramework;
 
 namespace LibraryOnline.Models
 {
-    public class AppUser : IdentityUser
+    [Table("Users")]
+    public class AppUser
     {
+        [Key, StringLength(128)]
+        public string Id { get; set; } = Guid.NewGuid().ToString();
+
+        [Required, StringLength(256), Index(IsUnique = true)]
+        public string Email { get; set; }
+
+        [Required, StringLength(20)]
+        public string Role { get; set; } = "Member";
+        public string PasswordHash { get; set; }
+        public string SecurityStamp { get; set; } = Guid.NewGuid().ToString();
+        public string PhoneNumber { get; set; }
+        public int AccessFailedCount { get; set; }
+        public DateTime? LockoutEndDateUtc { get; set; }
+
         [Required, StringLength(100)]
         public string FullName { get; set; }
         public bool IsActive { get; set; } = true;
@@ -197,7 +211,7 @@ namespace LibraryOnline.Models
         public string LibraryName { get; set; } = "Thư viện Mở";
     }
 
-    public class LibraryDb : IdentityDbContext<AppUser>
+    public class LibraryDb : DbContext
     {
         public LibraryDb()
             : base("LibraryDb")
@@ -206,6 +220,7 @@ namespace LibraryOnline.Models
             Configuration.ProxyCreationEnabled = false;
         }
 
+        public DbSet<AppUser> Users { get; set; }
         public DbSet<Category> Categories { get; set; }
         public DbSet<Book> Books { get; set; }
         public DbSet<Loan> Loans { get; set; }

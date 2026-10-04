@@ -60,7 +60,7 @@ Chạy `scripts/Verify-Demo.sql` trong SSMS để kiểm tra số lượng và t
 ```
 LibraryOnline.sln
 LibraryOnline/
-  Models/        # EF6 entities, Identity, request validation, seed
+  Models/        # EF6 entities, Users, request validation, seed
   Services/      # Transactional circulation, password hashing, maintenance
   Controllers/   # MVC pages, Web API endpoints, PDF reports
   Views/         # Razor shell
@@ -85,7 +85,7 @@ docs/            # Requirements mapping, architecture, API, demo, tests
 
 ## Bảo mật và triển khai
 
-ASP.NET Identity quản lý người dùng/vai trò; mật khẩu dùng PBKDF2-SHA256 150.000 vòng với salt ngẫu nhiên. Forms Authentication dùng cookie HttpOnly, SameSite và kiểm tra SecurityStamp mỗi request; đổi mật khẩu/khóa tài khoản vô hiệu hóa phiên cũ. Khóa đăng nhập tạm sau 5 lần sai. Các API ghi kiểm tra CSRF và quyền sở hữu; dữ liệu trả về không chứa password hash.
+Bảng Users lưu tài khoản và một cột Role (Member/Librarian/Administrator); AccountService quản lý đăng nhập; mật khẩu dùng PBKDF2-SHA256 150.000 vòng với salt ngẫu nhiên. Forms Authentication dùng cookie HttpOnly, SameSite và kiểm tra SecurityStamp mỗi request; đổi mật khẩu/khóa tài khoản vô hiệu hóa phiên cũ. Khóa đăng nhập tạm sau 5 lần sai. Các API ghi kiểm tra CSRF và quyền sở hữu; dữ liệu trả về không chứa password hash.
 
 Bản này cấu hình cho demo localhost. Trước triển khai công khai: dùng HTTPS và cookie `requireSSL`, tắt debug, tắt `DemoSeedEnabled` trước khởi tạo DB, tạo tài khoản quản trị theo quy trình riêng, thay tài khoản demo, cấp quyền SQL tối thiểu, cấu hình sao lưu/giám sát và machineKey an toàn nếu chạy nhiều instance. Không commit mật khẩu SQL, access token hoặc database backup lên GitHub.
 
@@ -99,3 +99,7 @@ Trong Solution Explorer, mở `LibraryOnline > App_Data`:
 - `Verify-Demo.sql`: kiểm tra dữ liệu demo trong `LibraryOnlineDemo`.
 
 Script schema không chứa dữ liệu tài khoản hoặc mật khẩu. Để có đầy đủ dữ liệu demo, làm theo hướng dẫn khởi tạo ứng dụng phía trên và để ứng dụng tạo database mới; tạo bảng thủ công trước sẽ không kích hoạt seeder `CreateDatabaseIfNotExists`.
+
+### Cơ sở dữ liệu đơn giản
+
+Xem [giải thích từng bảng](docs/DATABASE.md). Bản mới dùng một bảng Users với cột Role thay cho 5 bảng AspNet. Khi nâng cấp database cũ, sao lưu và chạy App_Data/SimplifyDatabase.sql trước khi chạy ứng dụng mới.

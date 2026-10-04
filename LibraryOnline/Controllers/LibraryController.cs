@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Data.Entity;
 using System.Linq;
 using System.Web.Http;
@@ -618,13 +618,7 @@ namespace LibraryOnline.Controllers
                     if (!new[] { "Member", "Librarian", "Administrator" }.Contains(input.Role))
                         throw new RuleException("Vai trò không hợp lệ.");
                     var m = Accounts.Manager(s.Db);
-                    var u = new AppUser
-                    {
-                        UserName = input.Email,
-                        Email = input.Email,
-                        FullName = input.FullName,
-                        LockoutEnabled = true,
-                    };
+                    var u = new AppUser { Email = input.Email, FullName = input.FullName };
                     var r = m.Create(u, input.Password);
                     if (!r.Succeeded)
                         throw new RuleException(string.Join(" ", r.Errors));
@@ -681,10 +675,7 @@ namespace LibraryOnline.Controllers
                         );
                     u.IsActive = input.IsActive;
                     u.SecurityStamp = Guid.NewGuid().ToString();
-                    var r = m.RemoveFromRoles(id, roles.ToArray());
-                    if (!r.Succeeded)
-                        throw new RuleException(string.Join(" ", r.Errors));
-                    r = m.AddToRole(id, input.Role);
+                    var r = m.AddToRole(id, input.Role);
                     if (!r.Succeeded)
                         throw new RuleException(string.Join(" ", r.Errors));
                     return new { message = "Đã cập nhật tài khoản." };
@@ -733,10 +724,7 @@ namespace LibraryOnline.Controllers
                     books = db.Books.Count(),
                     copies = db.Books.Sum(x => x.TotalCopies),
                     available = db.Books.Sum(x => x.AvailableCopies),
-                    members = db.Set<Microsoft.AspNet.Identity.EntityFramework.IdentityUserRole>()
-                        .Count(x =>
-                            x.RoleId == db.Roles.FirstOrDefault(r => r.Name == "Member").Id
-                        ),
+                    members = db.Users.Count(x => x.Role == "Member"),
                     active = loans.Count(x =>
                         x.Status == LoanStatus.Borrowed || x.Status == LoanStatus.Overdue
                     ),

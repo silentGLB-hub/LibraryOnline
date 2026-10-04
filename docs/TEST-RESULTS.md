@@ -98,3 +98,12 @@ Các kiểm tra này không thay thế kiểm thử tải, penetration test ho�
 - Trình duyệt: xem trước không đăng nhập, đăng nhập quay về sách đã chọn, mục lục và chuyển chương hoạt động.
 - SQL bổ sung bảng nội dung cho 50 sách, giữ nguyên dữ liệu nghiệp vụ hiện có. Nội dung đọc là văn bản minh họa; không phải toàn văn các tác phẩm trong danh mục.
 - Hướng dẫn sử dụng và API: [READING.md](READING.md).
+
+## Đơn giản hóa tài khoản (04/10/2026)
+
+- Chuyển 5 bảng AspNet sang Users với một cột Role; bảo toàn 23 tài khoản demo cũ và các liên kết nghiệp vụ. Bản sao lưu COPY_ONLY có CHECKSUM đã được RESTORE VERIFYONLY xác nhận hợp lệ trước khi chuyển đổi.
+- Build Debug thành công; integration **63/63** đạt trên SQL đã chuyển đổi.
+- Thêm 3 kiểm tra đạt: khóa sau 5 lần sai mật khẩu, từ chối vai trò không hợp lệ, đổi vai trò với một giá trị duy nhất. Script tests/simple_accounts.py chạy trên localhost:5090, dùng LIBRARY_DEMO_PASSWORD; tài khoản QA được khóa ở cuối.
+- Script schema mới đã kiểm tra cú pháp; DBCC CHECKCONSTRAINTS không báo vi phạm.
+- Các tài khoản/sách QA do integration tạo được khóa/lưu trữ; không phải dữ liệu demo gốc.
+- Đã thực thi LibraryOnline.Schema.sql trên database kiểm thử trống độc lập: tạo đủ 13 bảng nghiệp vụ, không lỗi ràng buộc; database kiểm thử đã được dọn sau khi kiểm tra.

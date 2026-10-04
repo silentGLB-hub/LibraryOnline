@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Data.Entity;
 using System.Linq;
 using System.Security.Principal;
@@ -69,12 +69,7 @@ namespace LibraryOnline
                     var u = db.Users.Find(t.Name);
                     if (u == null || !u.IsActive || u.SecurityStamp != t.UserData)
                         return;
-                    var roles = (
-                        from ur in db.Set<Microsoft.AspNet.Identity.EntityFramework.IdentityUserRole>()
-                        join r in db.Roles on ur.RoleId equals r.Id
-                        where ur.UserId == u.Id
-                        select r.Name
-                    ).ToArray();
+                    var roles = new[] { u.Role };
                     Context.User = new GenericPrincipal(new GenericIdentity(u.Id, "Forms"), roles);
                 }
             }

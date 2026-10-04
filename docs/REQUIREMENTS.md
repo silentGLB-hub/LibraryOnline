@@ -2,7 +2,7 @@
 
 | Yêu cầu | Điểm | Triển khai / nơi demo |
 |---|---:|---|
-| User and Role Management | 1.0 | Account, Profile, Users; Identity và SessionController |
+| User and Role Management | 1.0 | Account, Profile, Users; Users, AccountService và SessionController |
 | Book Catalog Management | 1.5 | ManageBooks; tất cả trường bắt buộc, CRUD, ảnh, tồn kho |
 | Book Search and Browsing | 0.75 | Catalog; tìm kiếm, bộ lọc, chi tiết và sách cùng thể loại |
 | Reservation and Borrowing | 2.0 | Loans; reserve, checkout, return, cancel, limit và transaction |

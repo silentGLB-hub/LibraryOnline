@@ -1,10 +1,9 @@
-﻿using System;
+using System;
 using System.Configuration;
 using System.Data.Entity;
 using System.Linq;
 using LibraryOnline.Services;
 using Microsoft.AspNet.Identity;
-using Microsoft.AspNet.Identity.EntityFramework;
 
 namespace LibraryOnline.Models
 {
@@ -12,9 +11,6 @@ namespace LibraryOnline.Models
     {
         protected override void Seed(LibraryDb db)
         {
-            var roleManager = new RoleManager<IdentityRole>(new RoleStore<IdentityRole>(db));
-            foreach (var role in new[] { "Administrator", "Librarian", "Member" })
-                roleManager.Create(new IdentityRole(role));
             db.Policies.Add(new LibraryPolicy());
             db.SaveChanges();
             if (ConfigurationManager.AppSettings["DemoSeedEnabled"] != "true")
@@ -27,13 +23,7 @@ namespace LibraryOnline.Models
             var manager = Accounts.Manager(db);
             Func<string, string, string, AppUser> user = (email, name, role) =>
             {
-                var u = new AppUser
-                {
-                    UserName = email,
-                    Email = email,
-                    FullName = name,
-                    LockoutEnabled = true,
-                };
+                var u = new AppUser { Email = email, FullName = name };
                 var r = manager.Create(u, seedPassword);
                 if (!r.Succeeded)
                     throw new Exception(string.Join(";", r.Errors));
