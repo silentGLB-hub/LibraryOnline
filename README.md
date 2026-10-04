@@ -90,3 +90,12 @@ ASP.NET Identity quản lý người dùng/vai trò; mật khẩu dùng PBKDF2-S
 Bản này cấu hình cho demo localhost. Trước triển khai công khai: dùng HTTPS và cookie `requireSSL`, tắt debug, tắt `DemoSeedEnabled` trước khởi tạo DB, tạo tài khoản quản trị theo quy trình riêng, thay tài khoản demo, cấp quyền SQL tối thiểu, cấu hình sao lưu/giám sát và machineKey an toàn nếu chạy nhiều instance. Không commit mật khẩu SQL, access token hoặc database backup lên GitHub.
 
 Tham khảo: [MVC 5 với EF6 — Microsoft Learn](https://learn.microsoft.com/en-us/aspnet/mvc/overview/getting-started/getting-started-with-ef-using-mvc/creating-an-entity-framework-data-model-for-an-asp-net-mvc-application).
+
+### File SQL trong dự án
+
+Trong Solution Explorer, mở `LibraryOnline > App_Data`:
+- `LibraryOnline.Schema.sql`: cấu trúc bảng, khóa chính/ngoại và bảng nội dung đọc sách, xuất từ model EF6. Chạy trong database trống đã chọn ở SSMS; không chạy trên database đang có dữ liệu.
+- `ReadingSchema.sql`: bổ sung bảng nội dung đọc sách nếu chưa có.
+- `Verify-Demo.sql`: kiểm tra dữ liệu demo trong `LibraryOnlineDemo`.
+
+Script schema không chứa dữ liệu tài khoản hoặc mật khẩu. Để có đầy đủ dữ liệu demo, làm theo hướng dẫn khởi tạo ứng dụng phía trên và để ứng dụng tạo database mới; tạo bảng thủ công trước sẽ không kích hoạt seeder `CreateDatabaseIfNotExists`.
